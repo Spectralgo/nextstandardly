@@ -1,0 +1,63 @@
+import {
+  {entityNames},
+  {EntityName},
+  New{EntityName},
+  // {EntityName}Update, // Uncomment if you have an update type
+} from "@/server/models/{EntityNames}";
+import { getTableName } from "drizzle-orm";
+import { StorageBroker } from "./StorageBroker";
+import { I{EntityName}Broker } from "./{EntityNames}.StorageBroker.Interface";
+
+const {entityNames}Table = getTableName({entityNames});
+
+export class {EntityName}Broker implements I{EntityName}Broker {
+  constructor() {
+    if (new.target === {EntityName}Broker) {
+      throw new TypeError(
+        `Cannot construct ${this.constructor.name} instances directly. Use StorageBroker instead.`,
+      );
+    }
+  }
+
+  async insert{EntityName}Async(
+    this: StorageBroker,
+    {entityName}: New{EntityName},
+  ): Promise<{EntityName}> {
+    return await this._insertAsync({entityNames}Table, {entityName});
+  }
+
+  async selectAll{EntityNames}Async(this: StorageBroker): Promise<{EntityName}[]> {
+    return await this._selectAllAsync({entityNames}Table);
+  }
+
+  async select{EntityName}ByIdAsync(
+    this: StorageBroker,
+    id: string,
+  ): Promise<{EntityName} | undefined> {
+    return await this._selectByIdAsync({entityNames}Table, id);
+  }
+
+  // TODO: Add additional methods as needed
+  // Example:
+  // async select{EntityName}ByNameAsync(
+  //   this: StorageBroker,
+  //   name: string,
+  // ): Promise<{EntityName} | undefined> {
+  //   return await this._selectByFieldAsync({entityNames}Table, "name", name);
+  // }
+
+  async update{EntityName}Async(
+    this: StorageBroker,
+    id: string,
+    {entityName}Update: Partial<{EntityName}>,
+  ): Promise<{EntityName}> {
+    return await this._updateAsync({entityNames}Table, id, {entityName}Update);
+  }
+
+  async delete{EntityName}Async(
+    this: StorageBroker,
+    id: string,
+  ): Promise<{EntityName}> {
+    return await this._deleteAsync({entityNames}Table, id);
+  }
+}

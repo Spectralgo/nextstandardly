@@ -1,0 +1,47 @@
+export class {EntityName}Exception extends Error {
+  public readonly cause?: Error;
+
+  constructor(message: string, cause?: Error) {
+    super(message);
+    this.name = "{EntityName}Exception";
+    this.cause = cause;
+  }
+}
+
+export class {EntityName}ValidationException extends {EntityName}Exception {
+  public readonly errors: Record<string, string[]>;
+
+  constructor(message: string, errors: Record<string, string[]>, cause?: Error) {
+    super(message, cause);
+    this.name = "{EntityName}ValidationException";
+    this.errors = errors;
+  }
+}
+
+export class {EntityName}DependencyException extends {EntityName}Exception {
+  constructor(message: string, cause?: Error) {
+    super(message, cause);
+    this.name = "{EntityName}DependencyException";
+  }
+}
+
+export class {EntityName}DependencyValidationException extends {EntityName}Exception {
+  constructor(message: string, cause?: Error) {
+    super(message, cause);
+    this.name = "{EntityName}DependencyValidationException";
+  }
+}
+
+export class {EntityName}ServiceException extends {EntityName}Exception {
+  constructor(message: string, cause?: Error) {
+    super(message, cause);
+    this.name = "{EntityName}ServiceException";
+  }
+}
+
+export class {EntityName}NotFoundException extends {EntityName}Exception {
+  constructor(identifier: string, cause?: Error) {
+    super(`{EntityName} with identifier ${identifier} was not found.`, cause);
+    this.name = "{EntityName}NotFoundException";
+  }
+}

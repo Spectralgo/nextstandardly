@@ -1,0 +1,52 @@
+import { /* field types */ } from "drizzle-orm/pg-core";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
+/**
+ * {EntityNames} TABLE
+ */
+export const {entityNames} = pgTable(
+  "{entityNames}",
+  {
+    // TODO: Add fields here
+    // Example:
+    // id: uuid("id").primaryKey().defaultRandom(),
+    // name: text("name").notNull(),
+  },
+  (table) => ({
+    // TODO: Add indexes or unique constraints here
+    // Example:
+    // nameIndex: index("name_idx").on(table.name),
+  }),
+);
+
+/**
+ * RELATIONS
+ */
+export const {entityName}Relations = relations({entityNames}, ({ one, many }) => ({
+  // TODO: Define relations here
+  // Example:
+  // user: one(users, {
+  //   fields: [{entityNames}.userId],
+  //   references: [users.id],
+  // }),
+}));
+
+/**
+ * TYPES & SCHEMA
+ */
+export type {EntityName} = InferSelectModel<typeof {entityNames}>;
+export type New{EntityName} = InferInsertModel<typeof {entityNames}>;
+export type {EntityName}Update = Partial<{EntityName}>;
+
+// Zod schemas
+export const insert{EntityName}Schema = createInsertSchema({entityNames}, {
+  // TODO: Add validation overrides if necessary
+  // Example:
+  // name: (schema) => schema.name.min(1).max(255), // Important Note: the column name is on the schema. {propName}: (schema) => schema.{propName}.min(1).max(255)
+  
+});
+
+export const select{EntityName}Schema = createSelectSchema({entityNames});
+
+// Note: createUpdateSchema does not exist in drizzle

@@ -1,0 +1,22 @@
+import {
+  {EntityName},
+  New{EntityName},
+  // {EntityName}Update, // Uncomment if you have an update type
+} from "@/server/models/{EntityNames}";
+
+export interface I{EntityName}Broker {
+  insert{EntityName}Async({entityName}: New{EntityName}): Promise<{EntityName}>;
+  selectAll{EntityNames}Async(): Promise<{EntityName}[]>;
+  select{EntityName}ByIdAsync(id: string): Promise<{EntityName} | undefined>;
+
+  // TODO: Add additional method signatures as needed
+  // Example:
+  // select{EntityName}ByNameAsync(name: string): Promise<{EntityName} | undefined>;
+
+  update{EntityName}Async(
+    id: string,
+    {entityName}Update: Partial<{EntityName}>,
+  ): Promise<{EntityName}>;
+
+  delete{EntityName}Async(id: string): Promise<{EntityName}>;
+}

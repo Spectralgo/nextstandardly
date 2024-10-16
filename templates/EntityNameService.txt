@@ -1,0 +1,164 @@
+import { {EntityName}, New{EntityName} } from "@/server/models/{EntityNames}";
+import { I{EntityName}Service } from "./{EntityName}Service.Interface";
+import {
+  {EntityName}ServiceValidation,
+  {EntityName}ServiceValidationError,
+} from "./{EntityName}Service.Validation";
+import {
+  {EntityName}ValidationException,
+  {EntityName}DependencyException,
+  {EntityName}DependencyValidationException,
+  {EntityName}ServiceException,
+  {EntityName}NotFoundException,
+} from "./{EntityName}Service.Exceptions";
+import { IStorageBroker } from "@/server/brokers/storage_broker/StorageBroker.Interface";
+import { IDateTimeBroker } from "@/server/brokers/date_time_broker/DateTimeBroker";
+import { ILoggingBroker } from "@/server/brokers/logging_broker/LoggingBroker.Interface";
+import {
+  StorageException,
+  StorageDependencyValidationException,
+} from "@/server/brokers/storage_broker/StorageExceptions";
+import crypto from "crypto";
+
+export class {EntityName}Service implements I{EntityName}Service {
+  private readonly validation: {EntityName}ServiceValidation;
+
+  constructor(
+    private readonly storageBroker: IStorageBroker,
+    private readonly dateTimeBroker: IDateTimeBroker,
+    private readonly loggingBroker: ILoggingBroker,
+  ) {
+    this.validation = new {EntityName}ServiceValidation(this.dateTimeBroker);
+  }
+
+  async add{EntityName}Async({entityName}: New{EntityName}): Promise<{EntityName}> {
+    return this.tryCatch(async () => {
+      this.validation.validate{EntityName}OnAdd({entityName});
+      const new{EntityName}: {EntityName} = {
+        id: crypto.randomUUID(),
+        ...{entityName},
+        // Add additional fields as necessary
+        // For example:
+        // createdAt: this.dateTimeBroker.getCurrentDate(),
+        // updatedAt: this.dateTimeBroker.getCurrentDate(),
+      };
+      return await this.storageBroker.insert{EntityName}Async(new{EntityName});
+    });
+  }
+
+  async retrieve{EntityName}ByIdAsync({entityName}Id: string): Promise<{EntityName}> {
+    return this.tryCatch(async () => {
+      this.validation.validate{EntityName}Id({entityName}Id);
+      const maybe{EntityName} = await this.storageBroker.select{EntityName}ByIdAsync({entityName}Id);
+      this.validation.validateStorage{EntityName}(maybe{EntityName}, {entityName}Id);
+      return maybe{EntityName}!;
+    });
+  }
+
+  async modify{EntityName}Async({entityName}: {EntityName}): Promise<{EntityName}> {
+    return this.tryCatch(async () => {
+      this.validation.validate{EntityName}OnModify({entityName});
+      const maybe{EntityName} = await this.storageBroker.select{EntityName}ByIdAsync({entityName}.id);
+      this.validation.validateStorage{EntityName}(maybe{EntityName}, {entityName}.id);
+      // Update fields as necessary
+      // const updated{EntityName}: {EntityName} = {
+      //   ...maybe{EntityName}!,
+      //   ...{entityName},
+      //   updatedAt: this.dateTimeBroker.getCurrentDate(),
+      // };
+      return await this.storageBroker.update{EntityName}Async({entityName}.id, {entityName});
+    });
+  }
+
+  async remove{EntityName}ByIdAsync({entityName}Id: string): Promise<{EntityName}> {
+    return this.tryCatch(async () => {
+      this.validation.validate{EntityName}Id({entityName}Id);
+      const maybe{EntityName} = await this.storageBroker.select{EntityName}ByIdAsync({entityName}Id);
+      this.validation.validateStorage{EntityName}(maybe{EntityName}, {entityName}Id);
+      return await this.storageBroker.delete{EntityName}Async({entityName}Id);
+    });
+  }
+
+  // Add other service methods as needed
+
+  private async tryCatch<T>(logic: () => Promise<T>): Promise<T> {
+    try {
+      return await logic();
+    } catch (error) {
+      if (error instanceof {EntityName}ServiceValidationError) {
+        throw this.createAndLogValidationException(error);
+      } else if (error instanceof StorageDependencyValidationException) {
+        throw this.createAndLogDependencyValidationException(error);
+      } else if (error instanceof StorageException) {
+        throw this.createAndLogDependencyException(error);
+      } else if (error instanceof {EntityName}NotFoundException) {
+        throw this.createAndLogNotFoundException(error);
+      } else if (error instanceof Error) {
+        throw this.createAndLogServiceException(error);
+      } else {
+        throw this.createAndLogServiceException(
+          new Error("An unexpected error occurred."),
+        );
+      }
+    }
+  }
+
+  private createAndLogValidationException(
+    error: {EntityName}ServiceValidationError,
+  ): {EntityName}ValidationException {
+    const validationException = new {EntityName}ValidationException(
+      error.message,
+      error.errors,
+      error,
+    );
+    this.loggingBroker.logError(
+      "{EntityName} validation error occurred.",
+      validationException,
+    );
+    return validationException;
+  }
+
+  private createAndLogDependencyValidationException(
+    error: Error,
+  ): {EntityName}DependencyValidationException {
+    const dependencyValidationException = new {EntityName}DependencyValidationException(
+      error.message,
+      error,
+    );
+    this.loggingBroker.logError(
+      "{EntityName} dependency validation error occurred.",
+      dependencyValidationException,
+    );
+    return dependencyValidationException;
+  }
+
+  private createAndLogDependencyException(
+    error: Error,
+  ): {EntityName}DependencyException {
+    const dependencyException = new {EntityName}DependencyException(
+      error.message,
+      error,
+    );
+    this.loggingBroker.logCritical(
+      "Critical {EntityName} dependency error occurred.",
+      dependencyException,
+    );
+    return dependencyException;
+  }
+
+  private createAndLogNotFoundException(
+    error: {EntityName}NotFoundException,
+  ): {EntityName}NotFoundException {
+    this.loggingBroker.logError("{EntityName} not found error occurred.", error);
+    return error;
+  }
+
+  private createAndLogServiceException(error: Error): {EntityName}ServiceException {
+    const serviceException = new {EntityName}ServiceException(error.message, error);
+    this.loggingBroker.logError(
+      "{EntityName} service error occurred.",
+      serviceException,
+    );
+    return serviceException;
+  }
+}

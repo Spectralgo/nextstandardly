@@ -1,0 +1,32 @@
+import { createOpenApiServerActionRouter } from "zsa-openapi";
+import {
+    getAll{EntityNames}_controller,
+    get{EntityName}ById_controller,
+    create{EntityName}_controller,
+    update{EntityName}_controller,
+    delete{EntityName}_controller,
+} from "@/server/action-controllers/{EntityName}.ActionController";
+
+export const {entityNames}Router = createOpenApiServerActionRouter({
+    pathPrefix: "/api/{entityNames}",
+})
+    .get("/", getAll{EntityNames}_controller, {
+        summary: "Get all {entityNames}",
+        description: "Retrieve a list of all {entityNames}",
+    })
+    .get("/{id}", get{EntityName}ById_controller, {
+        summary: "Get a {entityName} by ID",
+        description: "Retrieve a specific {entityName} by its ID",
+    })
+    .post("/", create{EntityName}_controller, {
+        summary: "Create a new {entityName}",
+        description: "Create a new {entityName} with the provided information",
+    })
+    .put("/{id}", update{EntityName}_controller, {
+        summary: "Update a {entityName}",
+        description: "Update an existing {entityName} with the provided information",
+    })
+    .delete("/{id}", delete{EntityName}_controller, {
+        summary: "Delete a {entityName}",
+        description: "Delete a specific {entityName} by its ID",
+    });

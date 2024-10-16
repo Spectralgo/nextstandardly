@@ -1,0 +1,139 @@
+import { {EntityName}, New{EntityName} } from "@/server/models/{EntityNames}";
+import { IDateTimeBroker } from "@/server/brokers/date_time_broker/DateTimeBroker";
+import { {EntityName}NotFoundException } from "./{EntityName}Service.Exceptions";
+
+export class {EntityName}ServiceValidation {
+  constructor(private readonly dateTimeBroker: IDateTimeBroker) {}
+
+  validate{EntityName}OnAdd({entityName}: New{EntityName}): void {
+    this.validate{EntityName}IsNotNull({entityName});
+
+    const rules: ValidationRule[] = [
+      // Add validation rules for required fields
+      // Example:
+      // {
+      //   condition: this.isInvalid({entityName}.someField),
+      //   message: "Some field is required",
+      //   parameter: nameof<New{EntityName}>("someField"),
+      // },
+    ];
+
+    validate(rules);
+  }
+
+  validate{EntityName}OnModify({entityName}: {EntityName}): void {
+    this.validate{EntityName}IsNotNull({entityName});
+
+    const rules: ValidationRule[] = [
+      // Add validation rules for required fields
+      // {
+      //   condition: this.isInvalidUuid({entityName}.id),
+      //   message: "{EntityName} ID must be a valid UUID",
+      //   parameter: nameof<{EntityName}>("id"),
+      // },
+    ];
+
+    validate(rules);
+  }
+
+  validate{EntityName}Id({entityName}Id: string): void {
+    const rules: ValidationRule[] = [
+      {
+        condition: this.isInvalidUuid({entityName}Id),
+        message: "{EntityName} ID must be a valid UUID",
+        parameter: "{entityName}Id",
+      },
+    ];
+
+    validate(rules);
+  }
+
+  validateStorage{EntityName}(maybe{EntityName}: {EntityName} | undefined, identifier: string): void {
+    const rules: ValidationRule[] = [
+      {
+        condition: this.isNullOrUndefined(maybe{EntityName}),
+        message: `{EntityName} with identifier ${identifier} was not found.`,
+        parameter: "{entityName}",
+      },
+    ];
+
+    validate(rules);
+  }
+
+  private validate{EntityName}IsNotNull({entityName}: New{EntityName} | {EntityName} | null | undefined): void {
+    const rules: ValidationRule[] = [
+      {
+        condition: this.isNullOrUndefined({entityName}),
+        message: "{EntityName} is null or undefined.",
+        parameter: "{entityName}",
+      },
+    ];
+
+    validate(rules);
+  }
+
+  private isInvalid(value: any): boolean {
+    return (
+      value === null ||
+      value === undefined ||
+      (typeof value === "string" && value.trim() === "")
+    );
+  }
+
+  private isNullOrUndefined(value: any): boolean {
+    return value === null || value === undefined;
+  }
+
+  private isInvalidUuid(value: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return !uuidRegex.test(value);
+  }
+
+  private isInvalidDate(value: any): boolean {
+    return !(value instanceof Date) || isNaN(value.getTime());
+  }
+}
+
+// Helper function to get property names
+function nameof<T>(name: Extract<keyof T, string>): string {
+  return name;
+}
+
+export class {EntityName}ServiceValidationError extends Error {
+  errors: Record<string, string[]> = {};
+
+  constructor(message = "{EntityName} service validation error occurred.") {
+    super(message);
+    this.name = "{EntityName}ServiceValidationError";
+  }
+
+  addError(parameter: string, message: string) {
+    if (!this.errors[parameter]) {
+      this.errors[parameter] = [];
+    }
+    this.errors[parameter].push(message);
+  }
+
+  throwIfErrors() {
+    if (Object.keys(this.errors).length > 0) {
+      throw this;
+    }
+  }
+}
+
+export interface ValidationRule {
+  condition: boolean;
+  message: string;
+  parameter: string;
+}
+
+export function validate(rules: ValidationRule[]) {
+  const validationError = new {EntityName}ServiceValidationError();
+  rules.forEach((rule) => {
+    if (rule.condition) {
+      validationError.addError(rule.parameter, rule.message);
+    }
+  });
+  validationError.throwIfErrors();
+}

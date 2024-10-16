@@ -1,0 +1,110 @@
+"use server";
+
+import { z } from "zod";
+import {
+  unauthenticatedActionClient,
+  unauthenticatedControllerClient,
+} from "@/server/action-controllers/ActionClient";
+import {
+  select{EntityName}Schema,
+  type New{EntityName},
+  type {EntityName},
+  insert{EntityName}Schema,
+} from "@/server/models/{EntityNames}";
+import { {EntityName}Service } from "@/server/services/foundations/{entityNames}/{EntityName}Service";
+import { StorageBroker } from "@/server/brokers/storage_broker/StorageBroker";
+import { DateTimeBroker } from "@/server/brokers/date_time_broker/DateTimeBroker";
+import { LoggingBroker } from "@/server/brokers/logging_broker/LoggingBroker";
+
+const getStorageBroker = () => new StorageBroker();
+const getDateTimeBroker = () => new DateTimeBroker();
+const getLoggingBroker = () => new LoggingBroker();
+const get{EntityName}Service = () =>
+  new {EntityName}Service(
+    getStorageBroker(),
+    getDateTimeBroker(),
+    getLoggingBroker(),
+  );
+
+// Handler functions
+async function handleGetAll{EntityNames}() {
+  const {entityName}Service = get{EntityName}Service();
+  const {entityNames} = await {entityName}Service.retrieveAll{EntityNames}Async();
+  return { {entityNames} };
+}
+
+async function handleGet{EntityName}ById(id: string) {
+  const {entityName}Service = get{EntityName}Service();
+  const {entityName} = await {entityName}Service.retrieve{EntityName}ByIdAsync(id);
+  return { {entityName} };
+}
+
+async function handleCreate{EntityName}(new{EntityName}: New{EntityName}) {
+  const {entityName}Service = get{EntityName}Service();
+  const {entityName} = await {entityName}Service.add{EntityName}Async(new{EntityName});
+  return { {entityName} };
+}
+
+async function handleUpdate{EntityName}(updated{EntityName}: {EntityName}) {
+  const {entityName}Service = get{EntityName}Service();
+  const {entityName} = await {entityName}Service.modify{EntityName}Async(updated{EntityName});
+  return { {entityName} };
+}
+
+async function handleDelete{EntityName}(id: string) {
+  const {entityName}Service = get{EntityName}Service();
+  const {entityName} = await {entityName}Service.remove{EntityName}ByIdAsync(id);
+  return { {entityName} };
+}
+
+// Server actions
+export const getAll{EntityNames}_serverAction = unauthenticatedActionClient.action(async () =>
+  handleGetAll{EntityNames}(),
+);
+
+export const get{EntityName}ById_serverAction = unauthenticatedActionClient
+  .schema(z.object({ id: z.string().uuid() }))
+  .action(async ({ parsedInput: { id } }) => handleGet{EntityName}ById(id));
+
+export const create{EntityName}_serverAction = unauthenticatedActionClient
+  .schema(insert{EntityName}Schema)
+  .action(async ({ parsedInput }) => handleCreate{EntityName}(parsedInput as New{EntityName}));
+
+export const update{EntityName}_serverAction = unauthenticatedActionClient
+  .schema(select{EntityName}Schema)
+  .action(async ({ parsedInput }) => handleUpdate{EntityName}(parsedInput as {EntityName}));
+
+export const delete{EntityName}_serverAction = unauthenticatedActionClient
+  .schema(z.object({ id: z.string().uuid() }))
+  .action(async ({ parsedInput: { id } }) => handleDelete{EntityName}(id));
+
+// Server Controllers
+export const getAll{EntityNames}_controller = unauthenticatedControllerClient.handler(async () =>
+  handleGetAll{EntityNames}(),
+);
+
+export const get{EntityName}ById_controller = unauthenticatedControllerClient
+  .input(z.object({ id: z.string().uuid() }))
+  .handler(async ({ input: { id } }) => handleGet{EntityName}ById(id));
+
+export const create{EntityName}_controller = unauthenticatedControllerClient
+  .input(insert{EntityName}Schema)
+  .handler(async ({ input }) => handleCreate{EntityName}(input));
+
+export const update{EntityName}_controller = unauthenticatedControllerClient
+  .input(select{EntityName}Schema)
+  .handler(async ({ input }) => handleUpdate{EntityName}(input));
+
+export const delete{EntityName}_controller = unauthenticatedControllerClient
+  .input(z.object({ id: z.string().uuid() }))
+  .handler(async ({ input: { id } }) => handleDelete{EntityName}(id));
+
+// TODO: Add additional handlers and actions as needed
+// Example:
+// async function handleGet{EntityName}ByEmail(email: string) {
+//   const {entityName}Service = get{EntityName}Service();
+//   const {entityName} = await {entityName}Service.retrieve{EntityName}ByEmailAsync(email);
+//   return { {entityName} };
+// }
+
+// Add corresponding actions and controllers

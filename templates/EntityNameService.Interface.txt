@@ -1,0 +1,9 @@
+import { {EntityName}, New{EntityName} } from "@/server/models/{EntityNames}";
+
+export interface I{EntityName}Service {
+  add{EntityName}Async({entityName}: New{EntityName}): Promise<{EntityName}>;
+  retrieve{EntityName}ByIdAsync({entityName}Id: string): Promise<{EntityName}>;
+  modify{EntityName}Async({entityName}: {EntityName}): Promise<{EntityName}>;
+  remove{EntityName}ByIdAsync({entityName}Id: string): Promise<{EntityName}>;
+  // Add other method signatures as needed
+}
