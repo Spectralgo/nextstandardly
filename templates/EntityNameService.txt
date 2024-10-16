@@ -55,6 +55,14 @@ export class {EntityName}Service implements I{EntityName}Service {
     });
   }
 
+   async retrieveAll{EntityNames}Async(): Promise<{EntityName}[]> {
+     return this.tryCatch(async () => {
+       const maybe{EntityNames} = await this.storageBroker.selectAll{EntityNames}Async();
+       this.validation.validateStorage{EntityNames}(storage{EntityNames});
+       return maybe{EntityNames};
+     });
+  }
+
   async modify{EntityName}Async({entityName}: {EntityName}): Promise<{EntityName}> {
     return this.tryCatch(async () => {
       this.validation.validate{EntityName}OnModify({entityName});
