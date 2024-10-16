@@ -1,6 +1,6 @@
 {
     "name": "nextstandardly",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A CLI tool for generating backend code components",
     "main": "generate_foundation.js",
     "type": "module",
